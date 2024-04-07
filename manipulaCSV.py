@@ -26,7 +26,7 @@ def carregarDados(nomeArquivo: str) -> list:
 
 ########################################################
 
-def gravarDados(nomeArquivo: str, campos: list, lista: list) -> bool:
+def gravarDados(nomeArquivo: str, campos: list, lista: list, modo: str = "w") -> bool:
     '''Grava a informação da lista em um arquivo CSV
 
     Parâmetros
@@ -34,6 +34,7 @@ def gravarDados(nomeArquivo: str, campos: list, lista: list) -> bool:
     nomeArquivo: nome do arquivo que contém os dados dos clientes
     campos: campos do header arquivo CSV
     lista: lista com os dados a serem gravados
+    modo: modo de abertura do arquivo ("w" para escrita, "a" para adição)
 
     Retorno
     -------
@@ -41,15 +42,15 @@ def gravarDados(nomeArquivo: str, campos: list, lista: list) -> bool:
     false caso ocorra algum erro durante a gravação
     '''
     try:
-        # abrindo o arquivo a ser gravado para escrita(sobreescreve o existente)
-        arq = open(nomeArquivo, "w", newline='')
-        meuCSV = csv.DictWriter(arq, fieldnames=campos, delimiter=';')
-        meuCSV.writeheader()
-        for r in lista:
-            meuCSV.writerow(r)
-            print(r)
+        # abrindo o arquivo a ser gravado com o modo especificado
+        with open(nomeArquivo, modo, newline='') as arq:
+            meuCSV = csv.DictWriter(arq, fieldnames=campos, delimiter=';')
+            if modo == "w":
+                meuCSV.writeheader()
+            for r in lista:
+                meuCSV.writerow(r)
+                print(r)
             arq.flush()
-        arq.close()
         return True
     except FileNotFoundError:
         print("erro na abertura do arquivo ", nomeArquivo)

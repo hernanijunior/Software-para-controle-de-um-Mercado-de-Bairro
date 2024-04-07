@@ -64,13 +64,12 @@ def registrar_venda(cliente, compras):
     # Calcula o valor total da compra
     valor_total = calcular_valor_total(compras)
 
+    # Adiciona pontos ao cliente
+    adicionar_pontos_cliente(cliente, valor_total)
+
     # Obtém o último ID de venda registrado
     vendas = mcsv.carregarDados("Vendas.csv")
     ultimo_id_venda = 1 if not vendas else int(vendas[-1]['ID']) + 1
-
-    # Registra a venda
-    venda = {'ID': str(ultimo_id_venda), 'CPF_Cliente': cliente['CPF'], 'Nome_Cliente': cliente['Nome'], 'Data_Compra': data_atual, 'Valor_Total': valor_total}
-    mcsv.gravarDados("Vendas.csv", list(venda.keys()), [venda])
 
     # Registra os itens comprados
     registros_itens_compra = []
@@ -82,10 +81,15 @@ def registrar_venda(cliente, compras):
         registros_itens_compra.append(produto_vendido)
 
     # Adiciona os registros de itens de compra ao arquivo sem sobrescrever o conteúdo existente
-    mcsv.gravarDados("ItensCompra.csv", list(compras[0].keys()) + ['ID_Venda', 'Data_Compra'], registros_itens_compra)
+    mcsv.gravarDados("ItensCompra.csv", list(compras[0].keys()) + ['ID_Venda', 'Data_Compra'], registros_itens_compra, modo="a")
+
+    # Registra a venda
+    venda = {'ID': str(ultimo_id_venda), 'CPF_Cliente': cliente['CPF'], 'Nome_Cliente': cliente['Nome'], 'Data_Compra': data_atual, 'Valor_Total': valor_total}
+    mcsv.gravarDados("Vendas.csv", list(venda.keys()), [venda], modo="a")
 
     # Atualiza o estoque
     atualizar_estoque(compras)
+
 
 def calcular_valor_total(compras):
     '''
@@ -153,3 +157,46 @@ def carrinho_de_compras(cpf):
         print(f"Valor total da compra: R$ {valor_total:.2f}")
     else:
         print("Nenhum produto adicionado ao carrinho.")
+
+def adicionar_pontos_cliente(cliente, valor_compra):
+    '''
+    Adiciona pontos ao cliente com base no valor da compra.
+
+    Parâmetros:
+        cliente (dict): Dados do cliente.
+        valor_compra (float): Valor total da compra.
+
+    Retorno:
+        None
+    '''
+    # Carregar os dados dos clientes
+    clientes = mcsv.carregarDados("Cliente.csv")
+
+    # Localizar o cliente pelo CPF
+    cpf_cliente = cliente.get('CPF')  # Obtém o CPF do cliente
+    cliente_encontrado = None
+    for c in clientes:
+        if c.get('CPF') == cpf_cliente:
+            cliente_encontrado = c
+            break
+
+    # Verificar se o cliente foi encontrado
+    if cliente_encontrado:
+        # Calcular a quantidade de pontos a serem adicionados
+        pontos_ganhos = int(valor_compra)  # Um ponto para cada 1 real gasto
+
+        # Atualizar os pontos do cliente
+        cliente_encontrado['Pontos'] = str(int(cliente_encontrado.get('Pontos', 0)) + pontos_ganhos)
+
+        # Atualizar o arquivo de clientes com os novos pontos
+        # Remover o cliente encontrado do arquivo
+        clientes.remove(cliente_encontrado)
+        # Adicionar o cliente atualizado
+        clientes.append(cliente_encontrado)
+        # Gravar os dados atualizados no arquivo
+        mcsv.gravarDados("Cliente.csv", list(cliente_encontrado.keys()), clientes, modo="w")
+    else:
+        print("Cliente não encontrado.")
+
+
+
