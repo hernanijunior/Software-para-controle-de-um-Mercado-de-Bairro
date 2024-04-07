@@ -58,9 +58,9 @@ def menu_produto():
             print_produtos(listaProdutos)
             mprod.cadastrar_produto(listaProdutos)
         elif opcao == '2':
-            lista_produtos = mprod.carregar()
+            listaProdutos = mprod.carregar()
             print_produtos(listaProdutos)
-            mprod.editar_produto(lista_produtos)
+            mprod.editar_produto(listaProdutos)
         elif opcao == '3':
             listaProdutos = mprod.carregar()
             print_produtos(listaProdutos)
