@@ -14,25 +14,25 @@ def carregar() -> list:
     return listaProdutos
 
 
-def cadastrar(listaProdutos: list) -> bool:
+def cadastrar_produto(listaProdutos: list) -> bool:
     apresentacao.limpaTela()
-    prod = apresentacao.CadastrarProduto()
+    prod = apresentacao.cadastrarProduto()
     listaProdutos.append(prod)
     campos = ["Id", "Setor", "Nome", "Preco", "Validade", "Quantidade"]
     return mcsv.gravarDados("Produtos.csv", campos, listaProdutos)
 
-def editar(listaProdutos: list) -> bool:
-    '''
-    Permite editar um produto na lista de produtos e atualizar o arquivo CSV
+# Dentro de manipulaProduto.py
 
-    Parâmetros
-    ----------
-    listaProdutos: Lista atual dos produtos
+def editar_produto(listaProdutos: list) -> None:
+    """
+    Permite editar um produto na lista de produtos e atualizar o arquivo CSV.
 
-    Retorno
-    -------
-    Retorna True se o produto foi editado com sucesso
-    '''
+    Parâmetros:
+        lista_produtos (list): Lista atual dos produtos.
+
+    Retorno:
+        None
+    """
     apresentacao.limpaTela()
     id_produto = input("Digite o ID do produto que deseja editar: ")
 
@@ -61,8 +61,80 @@ def editar(listaProdutos: list) -> bool:
 
             # Grava os produtos atualizados no arquivo CSV
             campos = ["Id", "Setor", "Nome", "Preco", "Validade", "Quantidade"]
-            return mcsv.gravarDados("Produtos.csv", campos, listaProdutos)
+            mcsv.gravarDados("Produtos.csv", campos, listaProdutos)
+
+            print("Produto editado com sucesso.")
+            break
+
+    if not produto_encontrado:
+        print("Produto não encontrado.")
+
+
+
+
+def excluir_produto(listaProdutos: list) -> bool:
+    '''
+    Exclui um produto da lista de produtos e atualiza o arquivo CSV
+
+    Parâmetros
+    ----------
+    listaProdutos: Lista atual dos produtos
+
+    Retorno
+    -------
+    Retorna True se o produto foi excluído com sucesso
+    '''
+    apresentacao.limpaTela()
+    id_produto = input("Digite o ID do produto que deseja excluir: ")
+
+    # Verifica se o produto está na lista
+    produto_encontrado = False
+    for produto in listaProdutos:
+        if produto['Id'] == id_produto:
+            produto_encontrado = True
+            print("Produto encontrado:")
+            print(produto)
+            print("-" * 30)
+
+            # Confirmação da exclusão
+            confirmacao = input("Tem certeza que deseja excluir este produto? (S/N): ").strip().upper()
+            if confirmacao == "S":
+                # Remove o produto da lista
+                listaProdutos.remove(produto)
+
+                # Grava os produtos atualizados no arquivo CSV
+                campos = ["Id", "Setor", "Nome", "Preco", "Validade", "Quantidade"]
+                return mcsv.gravarDados("Produtos.csv", campos, listaProdutos)
 
     if not produto_encontrado:
         print("Produto não encontrado.")
         return False
+
+def verifica_estoque_baixo(limite_estoque_baixo: int) -> list:
+    '''
+    Carrega a lista de produtos do arquivo Produtos.csv e verifica se há produtos com estoque baixo.
+
+    Parâmetros
+    ----------
+    limite_estoque_baixo: Limite inferior para considerar um estoque baixo
+
+    Retorno
+    -------
+    Retorna uma lista de dicionários com os produtos lidos.
+    '''
+    listaProdutos = mcsv.carregarDados("Produtos.csv")
+    produtos_estoque_baixo = []
+
+    for produto in listaProdutos:
+
+        if int(produto['Quantidade']) < limite_estoque_baixo:
+            produtos_estoque_baixo.append(produto)
+
+    if produtos_estoque_baixo:
+        print("Os seguintes produtos estão com estoque baixo:")
+        for produto in produtos_estoque_baixo:
+            print(produto)
+    else:
+        print("Nenhum produto está com estoque baixo.")
+
+    return listaProdutos

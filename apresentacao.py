@@ -1,64 +1,78 @@
 from os import system, name
+import manipulaCSV as mcsv
+import manipulaProduto as mprod
 
-
-#################################################################
 def limpaTela():
     '''
-    Limpa a tela de acordo com o systema operacional (Windows ou Linux)
+    Limpa a tela de acordo com o sistema operacional (Windows ou Linux)
     '''
     if name == 'nt':
         _ = system("cls")
     else:
         _ = system("clear")
 
-
-#################################################################
-
-def MenuPrincipal() -> str:
+def print_produtos(listaProdutos):
     '''
-    Exemplo de Menu principal para o sistema
-
-    Retorno
-    -------
-    Retorna válida escolhida
-
+    Imprime a lista de produtos formatada
     '''
-    opcoes = [1, 2, 3, 9]
-    opcao = 10
-    while opcao not in opcoes:
-        limpaTela()
-        print("#" * 20)
-        print("1.Venda\n2.Clientes\n3.Produto\n9.Sair")
-        print('#' * 20)
-        opcao = int(input("Opção -> "))
-    return opcao
+    print("{:<3} {:<10} {:<20} {:<7} {:<10} {:<10}".format("ID", "Setor", "Nome", "Preço", "Validade", "Quantidade"))
+    print("-" * 60)  # Linha divisória
+    for product in listaProdutos:
+        print("{:<3} {:<10} {:<20} {:<7} {:<10} {:<10}".format(product["Id"], product["Setor"], product["Nome"], product["Preco"], product["Validade"], product["Quantidade"]))
+    print()  # Linha em branco após a lista de produtos
 
-
-#################################################################
-
-def CadastrarProduto() -> dict:
+def cadastrarProduto():
     '''
-    Exibe uma interface para ler os dados de um produto
-
-    Retorno
-    -------
-    Retorno um dicionário com os campos e dados de um produto
+    Interface para cadastrar um novo produto
     '''
-    produto = {}
+    limpaTela()
     print("=" * 30)
     print("Cadastro de um novo produto ")
     print("=" * 30)
+    produto = {}
     produto['Id'] = input("Identificação do produto: ")
-    print("-" * 30)
     produto['Setor'] = input("Setor do produto: ")
-    print("-" * 30)
     produto['Nome'] = input("Nome do produto: ")
-    print("-" * 30)
     produto['Preco'] = float(input("Preço do produto: "))
-    print("-" * 30)
     produto['Validade'] = input("Data de validade do produto: ")
-    print("-" * 30)
     produto['Quantidade'] = int(input("Quantidade de produto no estoque: "))
     print("=" * 30)
     return produto
 
+def menu_produto():
+    '''
+    Exibe o menu relacionado aos produtos e executa a opção selecionada pelo usuário.
+    '''
+    while True:
+        limpaTela()
+        print("=== Menu Produto ===")
+        print("1. Cadastrar Produto")
+        print("2. Editar Produto")
+        print("3. Excluir Produto")
+        print("4. Verificar Estoque Baixo")
+        print("9. Voltar ao Menu Principal")
+        opcao = input("Escolha uma opção: ")
+
+        if opcao == '1':
+            listaProdutos = mprod.carregar()
+            print_produtos(listaProdutos)
+            mprod.cadastrar_produto(listaProdutos)
+        elif opcao == '2':
+            lista_produtos = mprod.carregar()
+            print_produtos(listaProdutos)
+            mprod.editar_produto(lista_produtos)
+        elif opcao == '3':
+            listaProdutos = mprod.carregar()
+            print_produtos(listaProdutos)
+            mprod.excluir_produto(listaProdutos)
+        elif opcao == '4':
+            limite_estoque_baixo = int(input("Qual o limite de estoque que pode ser considerado baixo: "))
+            mprod.verifica_estoque_baixo(limite_estoque_baixo)
+        elif opcao == '9':
+            print("Retornando ao Menu Principal...")
+            break
+        else:
+            print("Opção inválida. Por favor, escolha uma opção válida.")
+
+if __name__ == "__main__":
+    menu_produto()
