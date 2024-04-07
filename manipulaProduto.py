@@ -138,3 +138,30 @@ def verifica_estoque_baixo(limite_estoque_baixo: int) -> list:
         print("Nenhum produto está com estoque baixo.")
 
     return listaProdutos
+
+import csv
+
+def calcular_estoque_por_setor():
+    '''
+    Calcula a quantidade total de estoque por setor no arquivo Produtos.csv e imprime na tela.
+    '''
+    # Dicionário para armazenar a quantidade de estoque por setor
+    estoque_por_setor = {}
+
+    # Abre o arquivo Produtos.csv e lê os dados
+    with open('Produtos.csv', newline='', encoding='utf-8') as csvfile:
+        reader = csv.DictReader(csvfile, delimiter=';')
+        for row in reader:
+            setor = row['Setor']
+            quantidade = int(row['Quantidade'])
+            # Se o setor já estiver no dicionário, adiciona a quantidade de estoque
+            if setor in estoque_por_setor:
+                estoque_por_setor[setor] += quantidade
+            # Caso contrário, cria uma nova entrada no dicionário com a quantidade de estoque
+            else:
+                estoque_por_setor[setor] = quantidade
+
+    # Imprime a quantidade de estoque por setor
+    print("Quantidade de estoque por setor:")
+    for setor, estoque in estoque_por_setor.items():
+        print(f"{setor}: {estoque}")

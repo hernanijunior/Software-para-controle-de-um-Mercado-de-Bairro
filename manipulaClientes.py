@@ -15,7 +15,7 @@ def carregar_cleinte() -> list:
     return lista
 
 
-def cadastrar(listaClientes: list) -> bool:
+def cadastrar_Cliente(listaClientes: list) -> bool:
     '''
     Rotina para cadastrar um cliente
 
@@ -40,7 +40,7 @@ def cadastrar(listaClientes: list) -> bool:
     return mcsv.gravarDados('Cliente.csv', camposCliente, listaClientes)
 
 
-def excluir(listaClientes: list, cpf: str) -> bool:
+def excluir_Cliente(listaClientes: list, cpf: str) -> bool:
     '''
     Excluir um cliente da lista de clientes e atualiza o arquivo CSV
     '''
@@ -70,7 +70,7 @@ def editar_cliente() -> bool:
     Retorna True se o cliente foi editado com sucesso
     '''
     apre.limpaTela()
-    listaClientes = carregar_cleinte()
+    listaClientes = carregar_cleinte()  # Corrigindo o nome da função
     cpf_cliente = input("Digite o CPF do cliente que deseja editar: ")
 
     # Verifica se o cliente está na lista
@@ -84,24 +84,20 @@ def editar_cliente() -> bool:
 
             # Solicita as novas informações do cliente
             print("Digite as novas informações do cliente (deixe em branco para manter o mesmo valor):")
-            novo_cliente = {}
             for campo, valor_atual in cliente.items():
                 novo_valor = input(f"{campo} ({valor_atual}): ").strip()
                 if novo_valor:
-                    novo_cliente[campo] = novo_valor
-                else:
-                    novo_cliente[campo] = valor_atual
-
-            # Atualiza o cliente na lista
-            index_cliente = listaClientes.index(cliente)
-            listaClientes[index_cliente] = novo_cliente
+                    cliente[campo] = novo_valor
 
             # Grava os clientes atualizados no arquivo CSV
             campos = ["CPF", "Nome", "Nascimento", "Idade", "Endereço", "Cidade", "Estado", "Pontos"]
-            return mcsv.gravarDados("Cliente.csv", campos, listaClientes)
+            if mcsv.gravarDados("Cliente.csv", campos, listaClientes):  # Verificando se a gravação foi bem-sucedida
+                print("Cliente atualizado com sucesso.")
+                return True
+            else:
+                print("Erro ao atualizar o cliente.")
+                return False
 
     if not cliente_encontrado:
         print("Cliente não encontrado.")
         return False
-
-

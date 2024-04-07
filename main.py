@@ -3,7 +3,7 @@ import csv
 import manipulaCSV as mcsv
 import manipulaProduto as mprod
 import apresentacao as apre
-import manipulaProduto as mcli
+import manipulaClientes as mcli
 
 def limpaTela():
     '''
@@ -23,6 +23,7 @@ def MenuPrincipal() -> int:
     -------
     Retorna a opção escolhida
     '''
+    limpaTela()
     opcoes = [1, 2, 3, 4, 5, 9]
     opcao = 10
     while opcao not in opcoes:
@@ -54,9 +55,8 @@ def menu_principal():
             print("Opção de venda selecionada.")
             input("Pressione Enter para continuar...")
         elif opcao == '2':
-            # Implemente a lógica para a opção de clientes
             print("Opção de clientes selecionada.")
-            input("Pressione Enter para continuar...")
+            apre.menu_clientes()
         elif opcao == '3':
             print("Opção de produto selecionada.")
             apre.menu_produto()
