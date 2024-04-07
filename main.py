@@ -51,8 +51,7 @@ def menu_principal():
         opcao = input("Escolha uma opção: ")
 
         if opcao == '1':
-            # Implemente a lógica para a opção de venda
-            print("Opção de venda selecionada.")
+            apre.menu_Vendas()
             input("Pressione Enter para continuar...")
         elif opcao == '2':
             print("Opção de clientes selecionada.")

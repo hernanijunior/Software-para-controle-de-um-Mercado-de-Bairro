@@ -1,0 +1,4 @@
+Id;Setor;Nome;Preco;Validade;Quantidade;ID_Venda;Data_Compra
+1;Bebidas;Coca-Cola 2L;8.5;21/04/2026;;5;2024-04-07 15:35:25
+2;Frios;Salame;30.0;20/10/2026;;5;2024-04-07 15:35:25
+3;Bebidas;Agua;1.0;20/10/2026;;5;2024-04-07 15:35:25

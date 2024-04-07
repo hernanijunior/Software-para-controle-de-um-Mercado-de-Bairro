@@ -4,6 +4,7 @@ import manipulaCSV as mcsv
 import manipulaProduto as mprod
 import apresentacao as apre
 import manipulaClientes as mcli
+import manipulaCompras as mcomp
 
 def limpaTela():
     '''
@@ -104,6 +105,33 @@ def menu_clientes():
             mcli.excluir_Cliente(listaClientes, cpf)
         elif opcao == '3':
             mcli.editar_cliente()
+        elif opcao == '9':
+            print("Retornando ao Menu Principal...")
+            break
+        else:
+            print("Opção inválida. Por favor, escolha uma opção válida.")
+
+def menu_Vendas():
+    '''
+    Menu de opções para interação com o cliente.
+
+    Retorno:
+
+    '''
+    while True:
+        limpaTela()
+        print(f"Menu de Opções Venda")
+        print("1. Nova Venda")
+        print("2. Lista de Vendas do Cliente")
+        print("9. Retornar ao Menu Principal")
+
+        opcao = input("Escolha uma opção: ")
+
+        if opcao == '1':
+            cpf = input("Digite o CPF do cliente: ")
+            mcomp.carrinho_de_compras(cpf)
+        elif opcao == '2':
+            print()
         elif opcao == '9':
             print("Retornando ao Menu Principal...")
             break
