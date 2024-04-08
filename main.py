@@ -51,12 +51,15 @@ def menu_principal():
         opcao = input("Escolha uma opção: ")
 
         if opcao == '1':
+            limpaTela()
             apre.menu_Vendas()
             input("Pressione Enter para continuar...")
         elif opcao == '2':
+            limpaTela()
             print("Opção de clientes selecionada.")
             apre.menu_clientes()
         elif opcao == '3':
+            limpaTela()
             print("Opção de produto selecionada.")
             apre.menu_produto()
         elif opcao == '9':

@@ -122,7 +122,8 @@ def menu_Vendas():
         limpaTela()
         print(f"Menu de Opções Venda")
         print("1. Nova Venda")
-        print("2. Lista de Vendas do Cliente")
+        print("2. Relatorio top 5 mais vendidos ultimos 3 dias")
+        print("3. Pesquisar compras pelo CPF")
         print("9. Retornar ao Menu Principal")
 
         opcao = input("Escolha uma opção: ")
@@ -131,7 +132,10 @@ def menu_Vendas():
             cpf = input("Digite o CPF do cliente: ")
             mcomp.carrinho_de_compras(cpf)
         elif opcao == '2':
-            print()
+            mcomp.imprimir_itens_mais_vendidos_ultimos_3_dias()
+        elif opcao == '3':
+            cpf_procurado = input("Digite o CPF para consultar as informações de vendas: ")
+            mcomp.obter_informacoes_vendas_por_cpf(cpf_procurado)
         elif opcao == '9':
             print("Retornando ao Menu Principal...")
             break

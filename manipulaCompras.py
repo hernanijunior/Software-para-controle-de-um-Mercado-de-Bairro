@@ -75,16 +75,19 @@ def registrar_venda(cliente, compras):
     registros_itens_compra = []
     for produto in compras:
         produto_vendido = produto.copy()
+        quantidade_comprada = produto_vendido.pop('Quantidade')  # Remove a quantidade comprada do produto vendido
         produto_vendido['ID_Venda'] = str(ultimo_id_venda)
         produto_vendido['Data_Compra'] = data_atual
-        produto_vendido.pop('Quantidade')  # Remove a quantidade comprada do produto vendido
-        registros_itens_compra.append(produto_vendido)
+        # Adiciona cada item na lista conforme a quantidade comprada
+        for _ in range(quantidade_comprada):
+            registros_itens_compra.append(produto_vendido)
 
-    # Adiciona os registros de itens de compra ao arquivo sem sobrescrever o conteúdo existente
-    mcsv.gravarDados("ItensCompra.csv", list(compras[0].keys()) + ['ID_Venda', 'Data_Compra'], registros_itens_compra, modo="a")
+    # Adiciona os registros de itens de compra ao arquivo ItensCompra.csv sem sobrescrever o conteúdo existente
+    mcsv.gravarDados("ItensCompra.csv", list(compras[0].keys()) + ['ID_Venda', 'Data_Compra', 'Quantidade'], registros_itens_compra, modo="a")
 
     # Registra a venda
-    venda = {'ID': str(ultimo_id_venda), 'CPF_Cliente': cliente['CPF'], 'Nome_Cliente': cliente['Nome'], 'Data_Compra': data_atual, 'Valor_Total': valor_total}
+    venda = {'ID': str(ultimo_id_venda), 'CPF_Cliente': cliente['CPF'], 'Nome_Cliente': cliente['Nome'],
+             'Data_Compra': data_atual, 'Valor_Total': valor_total, 'Quantidade_Itens': len(registros_itens_compra)}  # Usamos a quantidade de registros de itens de compra
     mcsv.gravarDados("Vendas.csv", list(venda.keys()), [venda], modo="a")
 
     # Atualiza o estoque
@@ -133,11 +136,12 @@ def carrinho_de_compras(cpf):
     Retorno:
         None
     '''
+    lista=mcli.carregar_cleinte()
     cliente = verificar_cliente(cpf)
     if cliente is None:
         print("Cliente não cadastrado.")
         if input("Deseja cadastrar o cliente? (S/N): ").upper() == 'S':
-            mcli.cadastrar_Cliente([{'CPF': cpf}])  # Cadastra apenas com o CPF
+            mcli.cadastrar_Cliente(lista)
             return
 
     compras = []
@@ -199,4 +203,93 @@ def adicionar_pontos_cliente(cliente, valor_compra):
         print("Cliente não encontrado.")
 
 
+def imprimir_itens_mais_vendidos_ultimos_3_dias():
+    vendas = carregar_vendas_ultimos_3_dias()
 
+    # Contagem dos itens vendidos
+    contagem_itens = {}
+    for venda in vendas:
+        nome_produto = venda['Nome']
+        if nome_produto in contagem_itens:
+            contagem_itens[nome_produto] += 1
+        else:
+            contagem_itens[nome_produto] = 1
+
+    # Ordena os itens com base na contagem de vendas
+    itens_mais_vendidos = sorted(contagem_itens.items(), key=lambda x: x[1], reverse=True)
+
+    # Imprime os 5 itens mais vendidos
+    print("=== 5 Itens Mais Vendidos nos Últimos 3 Dias ===")
+    for i, (produto, quantidade) in enumerate(itens_mais_vendidos[:5], start=1):
+        print(f"{i}. {produto}: {quantidade} unidades")
+
+def carregar_vendas_ultimos_3_dias():
+    vendas = []
+    # Calcula a data de 3 dias atrás
+    data_3_dias_atras = datetime.datetime.now() - datetime.timedelta(days=3)
+
+    # Carrega os dados das vendas do arquivo ItensCompra.csv
+    with open('ItensCompra.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile, delimiter=';')
+        for item in reader:
+            if 'Data_Compra' in item:
+                data_compra = datetime.datetime.strptime(item['Data_Compra'], '%Y-%m-%d %H:%M:%S')
+                if data_compra >= data_3_dias_atras:
+                    vendas.append(item)
+    return vendas
+
+
+def contar_quantidade_por_produto(vendas):
+    quantidade_por_produto = {}
+    for venda in vendas:
+        id_venda = venda['ID']
+        # Carrega os dados dos itens comprados para a venda atual
+        with open('ItensCompra.csv', newline='') as csvfile:
+            reader = csv.DictReader(csvfile)
+            itens_compra = [item for item in reader if item['ID_Venda'] == id_venda]
+        for item in itens_compra:
+            id_produto = item['Id']
+            quantidade = int(item['Quantidade'])
+            quantidade_por_produto[id_produto] = quantidade_por_produto.get(id_produto, 0) + quantidade
+    return quantidade_por_produto
+
+def classificar_produtos_por_quantidade(quantidade_por_produto):
+    # Ordena os produtos com base na quantidade vendida
+    produtos_mais_vendidos = sorted(quantidade_por_produto.items(), key=lambda x: x[1], reverse=True)
+    return produtos_mais_vendidos
+
+def imprimir_top_5(produtos_mais_vendidos):
+    print("=== Top 5 Itens Mais Vendidos nos Últimos 3 Dias ===")
+    for i, (id_produto, quantidade) in enumerate(produtos_mais_vendidos[:5], start=1):
+        print(f"{i}. Produto ID: {id_produto}, Quantidade Vendida: {quantidade}")
+
+
+def obter_informacoes_vendas_por_cpf(cpf: str) -> None:
+    '''
+    Obtém informações de vendas relacionadas a um CPF específico e imprime na tela.
+
+    Parâmetros
+    ----------
+    cpf: CPF do cliente
+
+    Retorno
+    -------
+    None
+    '''
+    with open('Vendas.csv', newline='', encoding='utf-8') as csvfile:
+        reader = csv.DictReader(csvfile, delimiter=';')
+        vendas_cliente = []
+
+        for venda in reader:
+            if venda['CPF_Cliente'] == cpf:
+                vendas_cliente.append(venda)
+
+        if vendas_cliente:
+            print(f"Informações de vendas para o CPF {cpf}:")
+            for venda in vendas_cliente:
+                data_compra = venda['Data_Compra']
+                valor_total = float(venda['Valor_Total'])
+                quantidade_itens = int(venda['Quantidade_Itens'])
+                print(f"Data da compra: {data_compra},\n Valor total: R${valor_total},\n Quantidade de itens: {quantidade_itens}")
+        else:
+            print("Não foram encontradas vendas para o CPF fornecido.")

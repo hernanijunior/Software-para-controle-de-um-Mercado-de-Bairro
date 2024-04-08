@@ -57,6 +57,8 @@ def excluir_Cliente(listaClientes: list, cpf: str) -> bool:
 
 # Em manipulaClientes.py
 
+# No arquivo manipulaClientes.py
+
 def editar_cliente() -> bool:
     '''
     Permite editar um cliente na lista de clientes e atualizar o arquivo CSV
@@ -72,6 +74,7 @@ def editar_cliente() -> bool:
     apre.limpaTela()
     listaClientes = carregar_cleinte()  # Corrigindo o nome da função
     cpf_cliente = input("Digite o CPF do cliente que deseja editar: ")
+    campos = ["CPF", "Nome", "Nascimento", "Idade", "Endereço", "Cidade", "Estado", "Pontos"]
 
     # Verifica se o cliente está na lista
     cliente_encontrado = False
@@ -89,8 +92,9 @@ def editar_cliente() -> bool:
                 if novo_valor:
                     cliente[campo] = novo_valor
 
+
             # Grava os clientes atualizados no arquivo CSV
-            campos = ["CPF", "Nome", "Nascimento", "Idade", "Endereço", "Cidade", "Estado", "Pontos"]
+
             if mcsv.gravarDados("Cliente.csv", campos, listaClientes):  # Verificando se a gravação foi bem-sucedida
                 print("Cliente atualizado com sucesso.")
                 return True

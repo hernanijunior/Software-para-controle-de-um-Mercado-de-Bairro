@@ -1,5 +1,7 @@
 import csv
+import os
 
+import csv
 
 def carregarDados(nomeArquivo: str) -> list:
     ''' Carrega do arquivo CSV uma lista de informações, com cada item
@@ -15,9 +17,8 @@ def carregarDados(nomeArquivo: str) -> list:
     uma lista de dicionários contendo os dados do arquivo CSV que se deseja carregar
     '''
     try:
-        arq = open(nomeArquivo, "r")
-        listaClientes = csv.DictReader(arq, delimiter=';')
-        listaClientes = list(listaClientes)
+        with open(nomeArquivo, "r", encoding="utf-8") as arq:
+            listaClientes = list(csv.DictReader(arq, delimiter=';'))
     except FileNotFoundError:
         print("Arquivo não encontrado ", nomeArquivo)
         return []
@@ -25,6 +26,9 @@ def carregarDados(nomeArquivo: str) -> list:
 
 
 ########################################################
+
+
+
 
 def gravarDados(nomeArquivo: str, campos: list, lista: list, modo: str = "w") -> bool:
     '''Grava a informação da lista em um arquivo CSV
@@ -39,20 +43,28 @@ def gravarDados(nomeArquivo: str, campos: list, lista: list, modo: str = "w") ->
     Retorno
     -------
     Retorna True caso tenha sucesso ao gravar o cliente e
-    false caso ocorra algum erro durante a gravação
+    False caso ocorra algum erro durante a gravação
     '''
     try:
-        # abrindo o arquivo a ser gravado com o modo especificado
-        with open(nomeArquivo, modo, newline='') as arq:
+        # Verifica se o arquivo já existe
+        arquivo_existe = os.path.isfile(nomeArquivo)
+
+        # Abrindo o arquivo a ser gravado com o modo especificado e a codificação UTF-8
+        with open(nomeArquivo, modo, newline='', encoding='utf-8') as arq:
             meuCSV = csv.DictWriter(arq, fieldnames=campos, delimiter=';')
-            if modo == "w":
+
+            # Se o arquivo não existir ou for criado, escreva o cabeçalho
+            if modo == "w" or not arquivo_existe:
                 meuCSV.writeheader()
+
+            # Escreva os dados da lista
             for r in lista:
                 meuCSV.writerow(r)
-                print(r)
             arq.flush()
+
         return True
     except FileNotFoundError:
         print("erro na abertura do arquivo ", nomeArquivo)
         return False
+
 
