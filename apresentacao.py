@@ -48,7 +48,7 @@ def menu_produto():
     Exibe o menu relacionado aos produtos e executa a opção selecionada pelo usuário.
     '''
     while True:
-        limpaTela()
+
         print("=== Menu Produto ===")
         print("1. Cadastrar Produto")
         print("2. Editar Produto")
@@ -59,18 +59,22 @@ def menu_produto():
         opcao = input("Escolha uma opção: ")
 
         if opcao == '1':
+            limpaTela()
             listaProdutos = mprod.carregar()
             print_produtos(listaProdutos)
             mprod.cadastrar_produto(listaProdutos)
         elif opcao == '2':
+            limpaTela()
             listaProdutos = mprod.carregar()
             print_produtos(listaProdutos)
             mprod.editar_produto(listaProdutos)
         elif opcao == '3':
+            limpaTela()
             listaProdutos = mprod.carregar()
             print_produtos(listaProdutos)
             mprod.excluir_produto(listaProdutos)
         elif opcao == '4':
+            limpaTela()
             limite_estoque_baixo = int(input("Qual o limite de estoque que pode ser considerado baixo: "))
             mprod.verifica_estoque_baixo(limite_estoque_baixo)
         elif opcao == '5':
@@ -88,7 +92,6 @@ def menu_clientes():
     Exibe o menu relacionado aos clientes e executa a opção selecionada pelo usuário.
     '''
     while True:
-        limpaTela()
         print("=== Menu Clientes ===")
         print("1. Cadastrar Novo Cliente")
         print("2. Excluir Cliente")
@@ -97,13 +100,16 @@ def menu_clientes():
         opcao = input("Escolha uma opção: ")
 
         if opcao == '1':
+            limpaTela()
             listaClientes = mcli.carregar_cleinte()  # Corrigindo o nome da função
             mcli.cadastrar_Cliente(listaClientes)
         elif opcao == '2':
+            limpaTela()
             listaClientes = mcli.carregar_cleinte()  # Corrigindo o nome da função
             cpf = input("Digite o CPF do cliente a ser excluído: ")
             mcli.excluir_Cliente(listaClientes, cpf)
         elif opcao == '3':
+            limpaTela()
             mcli.editar_cliente()
         elif opcao == '9':
             print("Retornando ao Menu Principal...")
@@ -119,7 +125,6 @@ def menu_Vendas():
 
     '''
     while True:
-        limpaTela()
         print(f"Menu de Opções Venda")
         print("1. Nova Venda")
         print("2. Relatorio top 5 mais vendidos ultimos 3 dias")
@@ -129,11 +134,14 @@ def menu_Vendas():
         opcao = input("Escolha uma opção: ")
 
         if opcao == '1':
+            limpaTela()
             cpf = input("Digite o CPF do cliente: ")
             mcomp.carrinho_de_compras(cpf)
         elif opcao == '2':
+            limpaTela()
             mcomp.imprimir_itens_mais_vendidos_ultimos_3_dias()
         elif opcao == '3':
+            limpaTela()
             cpf_procurado = input("Digite o CPF para consultar as informações de vendas: ")
             mcomp.obter_informacoes_vendas_por_cpf(cpf_procurado)
         elif opcao == '9':
