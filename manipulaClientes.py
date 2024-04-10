@@ -1,5 +1,6 @@
 import manipulaCSV as mcsv
 import apresentacao as apre
+import manipulaCSV as mcsv
 
 
 def carregar_cleinte() -> list:
@@ -105,3 +106,44 @@ def editar_cliente() -> bool:
     if not cliente_encontrado:
         print("Cliente não encontrado.")
         return False
+
+
+def encontrar_item_favorito(cpf):
+    historico_compras = carregar_historico_compras(cpf)
+
+    if historico_compras:
+        # Contagem dos itens comprados
+        contagem_itens = {}
+        for compra in historico_compras:
+            id_produto = compra['Id']
+            contagem_itens[id_produto] = contagem_itens.get(id_produto, 0) + 1
+
+        # Encontrar o item mais comprado
+        item_favorito_id = max(contagem_itens, key=contagem_itens.get)
+
+        # Carregar os detalhes do item favorito
+        produto_favorito = carregar_detalhes_produto(item_favorito_id)
+
+        if produto_favorito:
+            print("Detalhes do item favorito do cliente:")
+            for chave, valor in produto_favorito.items():
+                print(f"{chave}: {valor}")
+        else:
+            print("Não foi possível encontrar detalhes do item favorito.")
+    else:
+        print("Não há histórico de compras para este cliente.")
+
+
+
+
+def carregar_historico_compras(cpf):
+    historico_compras = mcsv.carregarDados('ItensCompra.csv')
+    return [compra for compra in historico_compras if compra['CPF_Cliente'] == cpf]
+
+
+def carregar_detalhes_produto(id_produto):
+    produtos = mcsv.carregarDados('Produtos.csv')
+    for produto in produtos:
+        if produto['Id'] == id_produto:
+            return produto
+    return None

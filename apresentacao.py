@@ -25,6 +25,7 @@ def print_produtos(listaProdutos):
         print("{:<3} {:<10} {:<20} {:<7} {:<10} {:<10}".format(product["Id"], product["Setor"], product["Nome"], product["Preco"], product["Validade"], product["Quantidade"]))
     print()  # Linha em branco após a lista de produtos
 
+
 def cadastrarProduto():
     '''
     Interface para cadastrar um novo produto
@@ -34,14 +35,26 @@ def cadastrarProduto():
     print("Cadastro de um novo produto ")
     print("=" * 30)
     produto = {}
-    produto['Id'] = input("Identificação do produto: ")
-    produto['Setor'] = input("Setor do produto: ")
+    produto['Id'] = mcsv.gerar_id_unico()  # Usando o ID gerado automaticamente
+    # Solicita o setor do produto e verifica se é válido
+    setor_valido = False
+    while not setor_valido:
+        produto['Setor'] = input("Setor do produto: ")
+        setores_validos = ["Bebidas", "Frios", "Produtos de Limpeza", "Higiene Pessoal", "Padaria", "Frutas e Verduras", "Congelados"]
+
+        if produto['Setor'] in setores_validos:
+            setor_valido = True
+        else:
+            print("Setor inválido. Os setores válidos são:", setores_validos)
+
     produto['Nome'] = input("Nome do produto: ")
     produto['Preco'] = float(input("Preço do produto: "))
     produto['Validade'] = input("Data de validade do produto: ")
     produto['Quantidade'] = int(input("Quantidade de produto no estoque: "))
     print("=" * 30)
     return produto
+
+
 
 def menu_produto():
     '''
@@ -55,6 +68,7 @@ def menu_produto():
         print("3. Excluir Produto")
         print("4. Verificar Estoque Baixo")
         print("5. Quantidade de estoque por setor")
+        print("6. Verificar produtos vencidos")
         print("9. Voltar ao Menu Principal")
         opcao = input("Escolha uma opção: ")
 
@@ -80,6 +94,9 @@ def menu_produto():
         elif opcao == '5':
             limpaTela()
             mprod.calcular_estoque_por_setor()
+        elif opcao == '6':
+            limpaTela()
+            mprod.verificar_e_imprimir_produtos_vencidos()
         elif opcao == '9':
             print("Retornando ao Menu Principal...")
             break
@@ -96,6 +113,7 @@ def menu_clientes():
         print("1. Cadastrar Novo Cliente")
         print("2. Excluir Cliente")
         print("3. Atualizar Cliente")
+        print("4.Encontar o item favorito do cliente")
         print("9. Voltar ao Menu Principal")
         opcao = input("Escolha uma opção: ")
 
@@ -111,6 +129,10 @@ def menu_clientes():
         elif opcao == '3':
             limpaTela()
             mcli.editar_cliente()
+        elif opcao == '4':
+            limpaTela()
+            cpf=input (str("Digite o CPF do cliente as ser buscado o item  preferido"))
+            mcli.encontrar_item_favorito(cpf)
         elif opcao == '9':
             print("Retornando ao Menu Principal...")
             break

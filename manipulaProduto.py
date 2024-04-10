@@ -1,5 +1,7 @@
 import manipulaCSV as mcsv
 import apresentacao
+import csv
+from datetime import datetime
 
 
 def carregar() -> list:
@@ -51,7 +53,16 @@ def editar_produto(listaProdutos: list) -> None:
             for campo, valor_atual in produto.items():
                 novo_valor = input(f"{campo} ({valor_atual}): ").strip()
                 if novo_valor:
-                    novo_produto[campo] = novo_valor
+                    # Se o campo for 'Setor', verifique se o novo setor fornecido está na lista de setores válidos
+                    if campo == 'Setor':
+                        setores_validos = ["Bebidas", "Frios", "Produtos de Limpeza", "Higiene Pessoal", "Padaria", "Frutas e Verduras", "Congelados"]
+
+                        while novo_valor not in setores_validos:
+                            print("Setor inválido. Os setores válidos são:", setores_validos)
+                            novo_valor = input(f"{campo} ({valor_atual}): ").strip()
+                        novo_produto[campo] = novo_valor
+                    else:
+                        novo_produto[campo] = novo_valor
                 else:
                     novo_produto[campo] = valor_atual
 
@@ -139,7 +150,6 @@ def verifica_estoque_baixo(limite_estoque_baixo: int) -> list:
 
     return listaProdutos
 
-import csv
 
 def calcular_estoque_por_setor():
     '''
@@ -165,3 +175,36 @@ def calcular_estoque_por_setor():
     print("Quantidade de estoque por setor:")
     for setor, estoque in estoque_por_setor.items():
         print(f"{setor}: {estoque}")
+
+def verificar_e_imprimir_produtos_vencidos():
+        '''
+        Verifica e imprime na tela os produtos vencidos a partir do arquivo CSV fornecido.
+
+        Parâmetros:
+            nome_arquivo (str): O nome do arquivo CSV contendo os dados dos produtos.
+
+        Retorno:
+            None
+        '''
+        produtos = mcsv.carregarDados("Produtos.csv")
+
+        # Obtém a data atual
+        data_atual = datetime.now()
+
+        # Verifica a validade de cada produto e imprime os vencidos
+        produtos_vencidos = False
+        for produto in produtos:
+            validade = datetime.strptime(produto['Validade'], '%d/%m/%Y')
+            if validade < data_atual:
+                produtos_vencidos = True
+                print("Produto Vencido:")
+                print("ID:", produto['Id'])
+                print("Setor:", produto['Setor'])
+                print("Nome:", produto['Nome'])
+                print("Preço:", produto['Preco'])
+                print("Validade:", produto['Validade'])
+                print("Quantidade:", produto['Quantidade'])
+                print()
+
+        if not produtos_vencidos:
+            print("Não há produtos vencidos.")

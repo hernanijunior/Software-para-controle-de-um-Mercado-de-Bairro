@@ -68,3 +68,23 @@ def gravarDados(nomeArquivo: str, campos: list, lista: list, modo: str = "w") ->
         return False
 
 
+import csv
+
+
+def gerar_id_unico():
+    """
+    Gera um ID único para o produto baseado nos IDs existentes no arquivo Produtos.csv.
+
+    Retorna:
+        str: Um ID único que não existe no arquivo Produtos.csv.
+    """
+    with open("Produtos.csv", "r", newline='') as file:
+        reader = csv.DictReader(file, delimiter=';')  # Definindo o delimitador como ponto e vírgula
+        existing_ids = set(row['Id'] for row in reader)
+
+    # Encontra um ID único que não está presente nos IDs existentes
+    new_id = 1
+    while str(new_id) in existing_ids:
+        new_id += 1
+
+    return str(new_id)
