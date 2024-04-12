@@ -137,18 +137,19 @@ def verifica_estoque_baixo(limite_estoque_baixo: int) -> list:
     produtos_estoque_baixo = []
 
     for produto in listaProdutos:
-
         if int(produto['Quantidade']) < limite_estoque_baixo:
             produtos_estoque_baixo.append(produto)
 
     if produtos_estoque_baixo:
         print("Os seguintes produtos estão com estoque baixo:")
         for produto in produtos_estoque_baixo:
-            print(produto)
+            print(f"ID: {produto['Id']}, Setor: {produto['Setor']}, Nome: {produto['Nome']}, Preço: R${produto['Preco']}, Validade: {produto['Validade']}, Quantidade: {produto['Quantidade']}")
     else:
         print("Nenhum produto está com estoque baixo.")
 
     return listaProdutos
+
+verifica_estoque_baixo(10)
 
 
 def calcular_estoque_por_setor():
