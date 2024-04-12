@@ -32,20 +32,21 @@ def obter_info_produto():
     apre.limpaTela()
     print("=== Produtos Disponíveis ===")
     apre.print_produtos(lista_produtos)
-    id_produto = input("Digite o ID do produto que deseja comprar (ou '0' para encerrar a compra): ")
-    if id_produto == '0':
-        return None
-    for produto in lista_produtos:
-        if produto['Id'] == id_produto:
-            quantidade_desejada = int(input("Digite a quantidade desejada: "))
-            if quantidade_desejada <= int(produto['Quantidade']):
-                produto['Quantidade'] = quantidade_desejada
-                return produto
-            else:
-                print("Não há quantidade disponível para o produto.")
-                return None
-    print("Produto não encontrado.")
-    return None
+    while True:
+        id_produto = input("Digite o ID do produto que deseja comprar (ou '0' para encerrar a compra): ")
+        if id_produto == '0':
+            return None
+        for produto in lista_produtos:
+            if produto['Id'] == id_produto:
+                quantidade_desejada = int(input("Digite a quantidade desejada: "))
+                if quantidade_desejada <= int(produto['Quantidade']):
+                    produto['Quantidade'] = quantidade_desejada
+                    return produto
+                else:
+                    print("Não há quantidade suficiente disponível para o produto.")
+                    break
+        else:
+            print("Produto não encontrado.")
 
 
 def registrar_venda(cliente, compras):
@@ -70,7 +71,7 @@ def registrar_venda(cliente, compras):
     registros_itens_compra = []
     for produto in compras:
         produto_vendido = produto.copy()
-        quantidade_comprada = produto_vendido.pop('Quantidade')  # Remove a quantidade comprada do produto vendido
+        quantidade_comprada = produto_vendido.pop('Quantidade', 0)  # Remove a quantidade comprada do produto vendido
         produto_vendido['ID_Venda'] = str(ultimo_id_venda)
         produto_vendido['Data_Compra'] = data_atual
         produto_vendido['Quantidade'] = quantidade_comprada  # Adiciona a quantidade comprada ao registro
@@ -83,7 +84,8 @@ def registrar_venda(cliente, compras):
 
     # Registra a venda
     venda = {'ID': str(ultimo_id_venda), 'CPF_Cliente': cliente['CPF'], 'Nome_Cliente': cliente['Nome'],
-             'Data_Compra': data_atual, 'Valor_Total': calcular_valor_total(compras), 'Quantidade_Itens': len(registros_itens_compra)}  # Usamos a quantidade de registros de itens de compra
+             'Data_Compra': data_atual, 'Valor_Total': calcular_valor_total(compras),
+             'Quantidade_Itens': len(registros_itens_compra)}  # Usamos a quantidade de registros de itens de compra
     mcsv.gravarDados("Vendas.csv", list(venda.keys()), [venda], modo="a")
 
     # Atualiza o estoque
@@ -131,7 +133,7 @@ def carrinho_de_compras(cpf):
     Retorno:
         None
     '''
-    lista=mcli.carregar_cleinte()
+    lista = mcli.carregar_cleinte()
     cliente = verificar_cliente(cpf)
     if cliente is None:
         print("Cliente não cadastrado.")
@@ -203,9 +205,12 @@ def imprimir_itens_mais_vendidos_ultimos_3_dias():
     contagem_itens = contar_quantidade_por_produto(vendas)
     produtos_mais_vendidos = classificar_produtos_por_quantidade(contagem_itens)
 
+    nome_produtos = carregar_nomes_produtos()  # Carrega os nomes dos produtos
+
     print("=== 5 Itens Mais Vendidos nos Últimos 3 Dias ===")
     for i, (id_produto, quantidade) in enumerate(produtos_mais_vendidos[:5], start=1):
-        print(f"{i}. Produto ID: {id_produto.ljust(10)} Quantidade Vendida: {quantidade}")
+        nome_produto = nome_produtos.get(id_produto, "Produto Desconhecido")
+        print(f"{i}. Produto: {nome_produto.ljust(20)} Quantidade Vendida: {quantidade}")
 
 def carregar_vendas_ultimos_3_dias():
     vendas = []
@@ -236,10 +241,15 @@ def classificar_produtos_por_quantidade(quantidade_por_produto):
     produtos_mais_vendidos = sorted(quantidade_por_produto.items(), key=lambda x: x[1], reverse=True)
     return produtos_mais_vendidos
 
-def imprimir_top_5(produtos_mais_vendidos):
-    print("=== Top 5 Itens Mais Vendidos nos Últimos 3 Dias ===")
-    for i, (id_produto, quantidade) in enumerate(produtos_mais_vendidos[:5], start=1):
-        print(f"{i}. Produto ID: {id_produto}, Quantidade Vendida: {quantidade}")
+def carregar_nomes_produtos():
+    nomes_produtos = {}
+    with open('ItensCompra.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile, delimiter=';')
+        for item in reader:
+            id_produto = item['Id']
+            nome_produto = item['Nome']
+            nomes_produtos[id_produto] = nome_produto
+    return nomes_produtos
 
 
 def obter_informacoes_vendas_por_cpf(cpf: str) -> None:
@@ -254,20 +264,20 @@ def obter_informacoes_vendas_por_cpf(cpf: str) -> None:
     -------
     None
     '''
-    with open('Vendas.csv', newline='', encoding='utf-8') as csvfile:
-        reader = csv.DictReader(csvfile, delimiter=';')
-        vendas_cliente = []
+    vendas_cliente = []
 
-        for venda in reader:
-            if venda['CPF_Cliente'] == cpf:
-                vendas_cliente.append(venda)
+    lista_vendas = mcsv.carregarDados("Vendas.csv")
 
-        if vendas_cliente:
-            print(f"Informações de vendas para o CPF {cpf}:")
-            for venda in vendas_cliente:
-                data_compra = venda['Data_Compra']
-                valor_total = float(venda['Valor_Total'])
-                quantidade_itens = int(venda['Quantidade_Itens'])
-                print(f"Data da compra: {data_compra},\n Valor total: R${valor_total},\n Quantidade de itens: {quantidade_itens}")
-        else:
-            print("Não foram encontradas vendas para o CPF fornecido.")
+    for venda in lista_vendas:
+        if venda['CPF_Cliente'] == cpf:
+            vendas_cliente.append(venda)
+
+    if vendas_cliente:
+        print(f"Informações de vendas para o CPF {cpf}:")
+        for venda in vendas_cliente:
+            data_compra = venda['Data_Compra']
+            valor_total = float(venda['Valor_Total'])
+            quantidade_itens = int(venda['Quantidade_Itens'])
+            print(f"Data da compra: {data_compra},\n Valor total: R${valor_total},\n Quantidade de itens: {quantidade_itens}")
+    else:
+        print("Não foram encontradas vendas para o CPF fornecido.")
