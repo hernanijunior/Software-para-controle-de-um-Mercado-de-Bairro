@@ -79,7 +79,7 @@ def gerar_id_unico():
         str: Um ID único que não existe no arquivo Produtos.csv.
     """
     with open("Produtos.csv", "r", newline='') as file:
-        reader = csv.DictReader(file, delimiter=';')  # Definindo o delimitador como ponto e vírgula
+        reader = csv.DictReader(file, delimiter=';')  # Definindo o delimitador como ponto e vírgula.
         existing_ids = set(row['Id'] for row in reader)
 
     # Encontra um ID único que não está presente nos IDs existentes
