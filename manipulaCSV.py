@@ -68,7 +68,7 @@ def gravarDados(nomeArquivo: str, campos: list, lista: list, modo: str = "w") ->
         return False
 
 
-import csv
+
 
 
 def gerar_id_unico():
