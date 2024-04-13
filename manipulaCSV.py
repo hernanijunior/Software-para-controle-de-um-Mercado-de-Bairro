@@ -1,4 +1,3 @@
-import csv
 import os
 
 import csv
@@ -66,8 +65,6 @@ def gravarDados(nomeArquivo: str, campos: list, lista: list, modo: str = "w") ->
     except FileNotFoundError:
         print("erro na abertura do arquivo ", nomeArquivo)
         return False
-
-
 
 
 
